@@ -9,10 +9,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.coroutineScope
 import com.currency.converter.BuildConfig
 import com.currency.converter.R
-import com.currency.converter.presentation.vm.CurrencyViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -29,6 +27,11 @@ class MainActivity : AppCompatActivity() {
         }
         lifecycle.coroutineScope.launch {
             currencyViewModel.getCurrencyRate(BuildConfig.APP_ID)
+
+        }
+
+        lifecycle.coroutineScope.launch {
+            currencyViewModel.getAllCurrencies()
         }
 
     }

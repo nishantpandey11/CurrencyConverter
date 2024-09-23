@@ -2,8 +2,6 @@ package com.currency.converter.di
 
 import com.currency.converter.BuildConfig
 import com.currency.converter.data.remote.ApiService
-import com.currency.converter.data.remote.CurrencyRepositoryImpl
-import com.currency.converter.domain.repository.CurrencyRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,9 +12,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+/**
+ * Hilt module that provides dependencies related to the Network.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object NetworkModule {
 
     @Provides
     fun provideBaseUrl() = BuildConfig.BASE_URL
@@ -52,9 +53,5 @@ object AppModule {
     @Singleton
     fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
 
-    @Provides
-    @Singleton
-    fun provideCurrencyRepository(apiService: ApiService): CurrencyRepository =
-        CurrencyRepositoryImpl(apiService)
 
 }
