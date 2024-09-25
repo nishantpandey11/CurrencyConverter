@@ -1,8 +1,10 @@
 package com.currency.converter.presentation
 
-import android.util.Log
+import com.currency.converter.utils.AppLogger
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.currency.converter.R
+import com.currency.converter.data.local.Currency
 import com.currency.converter.domain.CurrencyCodeUseCase
 import com.currency.converter.domain.CurrencyRateUseCase
 import com.currency.converter.presentation.model.CurrencyListState
@@ -19,12 +21,11 @@ class CurrencyViewModel @Inject constructor(
     private val currencyRateUseCase: CurrencyRateUseCase,
     private val currencyCodeUseCase: CurrencyCodeUseCase
 ) : ViewModel() {
+
+    private val TAG = "CurrencyViewModel"
     private val _currencyListState = MutableStateFlow<CurrencyListState>(CurrencyListState.Loading)
     val currencyListState = _currencyListState.asStateFlow()
 
-    private val _currencyExchangeRateState =
-        MutableStateFlow<CurrencyListState>(CurrencyListState.Loading)
-    val currencyExchangeRateState = _currencyExchangeRateState.asStateFlow()
 
     fun getAllCurrencies() {
         currencyCodeUseCase().onEach {
@@ -34,12 +35,12 @@ class CurrencyViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
-                    Log.e("====>", it.data.toString())
+                    AppLogger.e(TAG, it.data.toString())
                     _currencyListState.value = CurrencyListState.Success(it.data)
                 }
 
                 is Resource.Error -> {
-                    Log.e("====>", it.message.toString())
+                    AppLogger.e(TAG, it.message.toString())
                     _currencyListState.value =
                         CurrencyListState.Error(it.message ?: "Something went wrong!")
                 }
@@ -66,6 +67,30 @@ class CurrencyViewModel @Inject constructor(
 
             }
         }.launchIn(viewModelScope)
+
+
+    }
+
+    fun getCurrencyValue(
+        selectedCurrency: Int,
+        amount: String,
+        currencies: List<Currency>
+    ): List<Currency> {
+        if (amount.isEmpty()) {
+            _currencyListState.value =
+                CurrencyListState.Error("Please enter a valid amount")
+            return emptyList()
+        }
+        if(currencies.isEmpty()) {
+            _currencyListState.value =
+                CurrencyListState.Error("Currency List empty")
+            return emptyList()
+        }
+        val amountInUsd = amount.toDouble() / currencies[selectedCurrency].exchangeRate
+
+        return currencies.map {
+            it.copy(exchangeRate = String.format("%.3f", amountInUsd * it.exchangeRate).toDouble())
+        }
 
 
     }

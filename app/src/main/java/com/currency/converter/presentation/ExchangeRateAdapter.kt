@@ -10,19 +10,12 @@ import com.currency.converter.R
 import com.currency.converter.data.local.Currency
 
 class ExchangeRateAdapter(
-    private val selectedCurrency: Int,
-    private var amount: Double = 1.0,
-    val data: List<Currency>
+    private var data: List<Currency>
 ) :
     RecyclerView.Adapter<ExchangeRateAdapter.ExchangeRateVH>() {
     class ExchangeRateVH(view: View) : ViewHolder(view) {
         val tvCurrencyName: TextView = view.findViewById(R.id.tv_currency_name)
         val tvCurrencyValue: TextView = view.findViewById(R.id.tv_currency_value)
-    }
-
-    fun refreshCurrencyValue(amount: Double) {
-        this.amount = amount
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(
@@ -35,14 +28,8 @@ class ExchangeRateAdapter(
     }
 
     override fun onBindViewHolder(holder: ExchangeRateVH, position: Int) {
-
-        //selected exchange rate would be selected currency exchange rate
-        //val amountInUsd = amount / selectedExchangeRateToUsd
-        val amountInUsd = amount / data[selectedCurrency].exchangeRate
-        val currValue = amountInUsd * data[position].exchangeRate
-
         holder.tvCurrencyName.text = data[position].currencyCode
-        holder.tvCurrencyValue.text = String.format("%.3f", currValue)
+        holder.tvCurrencyValue.text = data[position].exchangeRate.toString()
 
     }
 

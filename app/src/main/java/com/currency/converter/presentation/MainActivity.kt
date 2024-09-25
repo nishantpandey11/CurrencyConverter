@@ -1,7 +1,8 @@
 package com.currency.converter.presentation
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -22,12 +23,13 @@ import com.currency.converter.BuildConfig
 import com.currency.converter.R
 import com.currency.converter.data.local.Currency
 import com.currency.converter.presentation.model.CurrencyListState
+import com.currency.converter.utils.AppLogger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NetworkChangeListener {
     private val currencyViewModel: CurrencyViewModel by viewModels()
     private lateinit var currencySpinner: Spinner
     private lateinit var etAmount: EditText
@@ -35,9 +37,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rvCurrencyValue: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var adapter: ExchangeRateAdapter
-    private lateinit var exchangeRateList: List<Currency>
+    private var exchangeRateList: List<Currency> = emptyList()
     private var selectedCurrencyPosition: Int = 0
+    private lateinit var networkReceiver: NetworkChangeReceiver
+    private var hasFetchFinished: Boolean = false
+    private val TAG = "MainActivity"
 
+
+    override fun onResume() {
+        super.onResume()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkReceiver, intentFilter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkReceiver)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -48,6 +64,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         initViews()
+        networkReceiver = NetworkChangeReceiver(this)
         initObservers()
 
 
@@ -66,49 +83,56 @@ class MainActivity : AppCompatActivity() {
 
         btnSubmit.setOnClickListener {
             val text = etAmount.text.toString()
-            if(text.isEmpty()){
-                showError("Please enter a valid amount")
-                return@setOnClickListener
-            }
-            val amount = text.toDouble()
-            setAdapter(amount, exchangeRateList)
-            //adapter.refreshCurrencyValue(etAmount.text.toString().toDouble())
+            val amountValueInOtherCurrenciesList =
+                currencyViewModel.getCurrencyValue(selectedCurrencyPosition, text, exchangeRateList)
+            setAdapter(amountValueInOtherCurrenciesList)
         }
     }
 
-    private fun setAdapter(amount: Double, exchangeRates: List<Currency>) {
-        adapter = ExchangeRateAdapter(selectedCurrencyPosition, amount, exchangeRates)
+    private fun setAdapter(exchangeRates: List<Currency>) {
+        adapter = ExchangeRateAdapter(data = exchangeRates)
         rvCurrencyValue.adapter = adapter
     }
 
     private fun initObservers() {
+
         lifecycle.coroutineScope.launch {
             currencyViewModel.getExchangeRate(BuildConfig.APP_ID)
 
         }
 
-        lifecycle.coroutineScope.launch {
+        /*lifecycle.coroutineScope.launch {
             currencyViewModel.getAllCurrencies()
-        }
+
+        }*/
 
         lifecycle.coroutineScope.launch(Dispatchers.Main) {
             currencyViewModel.currencyListState.collect { currencyListState ->
                 when (currencyListState) {
                     is CurrencyListState.Loading -> showLoading()
-                    is CurrencyListState.Error -> showError(currencyListState.message)
-
-                    is CurrencyListState.Success -> {
-                        hideLoading()
-                        currencyListState.currencies?.let { initSpinner(it) }
+                    is CurrencyListState.Error -> {
+                        showError(currencyListState.message)
+                        hasFetchFinished = true
                     }
 
                     is CurrencyListState.ExchangeRateSuccess -> {
                         hideLoading()
                         currencyListState.exchangeRate?.let {
                             exchangeRateList = it
-                            setAdapter(1.0, it)
+                            setAdapter(it)
+                            currencyViewModel.getAllCurrencies()
                         }
                     }
+
+                    is CurrencyListState.Success -> {
+                        hideLoading()
+                        currencyListState.currencies?.let {
+                            initSpinner(it)
+                            hasFetchFinished = true
+                        }
+                    }
+
+
                 }
             }
         }
@@ -137,7 +161,7 @@ class MainActivity : AppCompatActivity() {
 
         currencySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                Log.e("===>", "onNothingSelected")
+
             }
 
             override fun onItemSelected(
@@ -148,8 +172,19 @@ class MainActivity : AppCompatActivity() {
             ) {
                 val type = parent?.getItemAtPosition(position).toString()
                 selectedCurrencyPosition = position
-                Log.e("===>", type)
+                AppLogger.e(TAG, type)
             }
         }
     }
+
+    override fun onNetworkChanged() {
+        AppLogger.e(TAG, "network changed")
+        if (hasFetchFinished && exchangeRateList.isEmpty()) {
+            initObservers()
+        }
+    }
+}
+
+interface NetworkChangeListener {
+    fun onNetworkChanged()
 }

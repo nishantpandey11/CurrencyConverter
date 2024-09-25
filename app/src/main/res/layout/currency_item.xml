@@ -30,8 +30,8 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_margin="@dimen/_10dp"
+        android:layout_height="@dimen/_1dp"
+        android:layout_margin="@dimen/_5dp"
         android:background="@color/color_view_background"
         app:layout_constraintTop_toBottomOf="@id/tv_currency_value" />
 

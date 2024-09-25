@@ -3,7 +3,6 @@ package com.currency.converter.domain
 import com.currency.converter.data.local.Currency
 import com.currency.converter.data.model.CurrencyRateData
 import com.currency.converter.utils.Resource
-import kotlinx.coroutines.Dispatchers
 
 interface CurrencyRepository {
     suspend fun getCurrencyRates(appID: String): Resource<CurrencyRateData>
@@ -20,6 +19,5 @@ interface CurrencyRepository {
     suspend fun isDataEmpty(): Boolean
     suspend fun isDataStale(): Boolean
     suspend fun isCurrencyTableEmpty():Boolean
-
 
 }

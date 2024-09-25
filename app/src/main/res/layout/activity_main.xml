@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".presentation.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -12,12 +13,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
-        android:elevation="8dp"
+        android:elevation="@dimen/_8dp"
+        app:titleTextColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="App Name"
-        app:titleTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
+        app:title="@string/app_name" />
 
     <!-- EditText -->
     <EditText
@@ -25,10 +26,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_10dp"
-        android:layout_marginTop="16dp"
-        android:hint="Enter amount"
+        android:layout_marginTop="@dimen/_16dp"
+        android:hint="@string/hint_amount"
         android:inputType="numberDecimal"
-        android:padding="16dp"
+        android:imeOptions="actionDone"
+        android:padding="@dimen/_16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
@@ -49,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_10dp"
-        android:text="Submit"
+        android:text="@string/txt_calculate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinner_currency" />
@@ -60,8 +62,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/_10dp"
-        android:layout_marginTop="16dp"
-        android:padding="16dp"
+        android:layout_marginTop="@dimen/_16dp"
+        android:padding="@dimen/_16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
