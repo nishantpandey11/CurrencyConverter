@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.hiltAndroid)
     id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
 
 }
 
@@ -76,11 +76,10 @@ dependencies {
     //datastore
     implementation(libs.dataStore)
 
-
-
-
-
-
+    //uni-testing
+    testImplementation (libs.kotlinx.coroutines.test)
+    testImplementation (libs.mockito.core)
+    testImplementation (libs.mockito.kotlin)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -22,8 +22,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.currency.converter.BuildConfig
 import com.currency.converter.R
 import com.currency.converter.data.local.Currency
-import com.currency.converter.presentation.model.CurrencyListState
 import com.currency.converter.utils.AppLogger
+import com.currency.converter.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -83,8 +83,21 @@ class MainActivity : AppCompatActivity(), NetworkChangeListener {
 
         btnSubmit.setOnClickListener {
             val text = etAmount.text.toString()
+            if (text.isEmpty()) {
+                showError("Please enter a valid amount")
+                return@setOnClickListener
+            }
+            if (exchangeRateList.isEmpty()) {
+                showError("Currency List empty")
+                exchangeRateList = emptyList()
+                return@setOnClickListener
+            }
             val amountValueInOtherCurrenciesList =
-                currencyViewModel.getCurrencyValue(selectedCurrencyPosition, text, exchangeRateList)
+                currencyViewModel.getCurrencyValue(
+                    selectedCurrencyPosition,
+                    text.toDouble(),
+                    exchangeRateList
+                )
             setAdapter(amountValueInOtherCurrenciesList)
         }
     }
@@ -98,46 +111,49 @@ class MainActivity : AppCompatActivity(), NetworkChangeListener {
 
         lifecycle.coroutineScope.launch {
             currencyViewModel.getExchangeRate(BuildConfig.APP_ID)
-
         }
 
-        /*lifecycle.coroutineScope.launch {
-            currencyViewModel.getAllCurrencies()
-
-        }*/
-
         lifecycle.coroutineScope.launch(Dispatchers.Main) {
-            currencyViewModel.currencyListState.collect { currencyListState ->
+            currencyViewModel.exchangeRateState.collect { currencyListState ->
                 when (currencyListState) {
-                    is CurrencyListState.Loading -> showLoading()
-                    is CurrencyListState.Error -> {
-                        showError(currencyListState.message)
+                    is Resource.Loading -> showLoading()
+                    is Resource.Error -> {
+                        showError(currencyListState.message!!)
                         hasFetchFinished = true
                     }
 
-                    is CurrencyListState.ExchangeRateSuccess -> {
+                    is Resource.Success -> {
                         hideLoading()
-                        currencyListState.exchangeRate?.let {
+                        currencyListState.data?.let {
                             exchangeRateList = it
                             setAdapter(it)
                             currencyViewModel.getAllCurrencies()
                         }
                     }
-
-                    is CurrencyListState.Success -> {
-                        hideLoading()
-                        currencyListState.currencies?.let {
-                            initSpinner(it)
-                            hasFetchFinished = true
-                        }
-                    }
-
-
                 }
             }
         }
 
+        lifecycle.coroutineScope.launch(Dispatchers.Main) {
+            currencyViewModel.currencyListState.collect { currencyListState ->
+                when (currencyListState) {
+                    is Resource.Loading -> showLoading()
+                    is Resource.Error -> {
+                        showError(currencyListState.message!!)
+                        hasFetchFinished = true
+                    }
 
+                    is Resource.Success -> {
+                        hideLoading()
+                        currencyListState.data?.let {
+                            initSpinner(it)
+                            hasFetchFinished = true
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
     private fun showLoading() {

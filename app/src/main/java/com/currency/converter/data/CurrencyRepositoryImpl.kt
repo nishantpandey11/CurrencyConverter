@@ -6,11 +6,9 @@ import com.currency.converter.data.local.DataStoreManager
 import com.currency.converter.data.model.CurrencyRateData
 import com.currency.converter.data.remote.ApiService
 import com.currency.converter.domain.CurrencyRepository
-import com.currency.converter.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import java.io.IOException
+import retrofit2.Response
 import javax.inject.Inject
 
 class CurrencyRepositoryImpl @Inject constructor(
@@ -18,21 +16,11 @@ class CurrencyRepositoryImpl @Inject constructor(
     private val currencyDao: CurrencyDao,
     private val dataStoreManager: DataStoreManager,
 ) : CurrencyRepository {
-    override suspend fun getCurrencyRates(appID: String): Resource<CurrencyRateData> {
-        return try {
-            val res = apiService.getCurrencyRates(appID)
-            if (res.isSuccessful) {
-                res.body()?.let {
-                    Resource.Success(it)
-                } ?: Resource.Error("Unknown Error Occurred")
-            } else
-                Resource.Error(res.message())
-        } catch (e: HttpException) {
-            Resource.Error("Unexpected HttpException " + e.localizedMessage)
-        } catch (e: IOException) {
-            Resource.Error("IO Exception, couldn't reach server " + e.localizedMessage)
-        }
 
+    override suspend fun getCurrencyRates(appID: String): Response<CurrencyRateData> {
+        return withContext(Dispatchers.IO) {
+            apiService.getCurrencyRates(appID)
+        }
     }
 
     override suspend fun upsertCurrency(currency: Currency) {
@@ -109,9 +97,8 @@ class CurrencyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isCurrencyTableEmpty(): Boolean {
-        return currencyDao.getCurrencyCount() == 0
+        return withContext(context = Dispatchers.IO) {
+            currencyDao.getCurrencyCount() == 0
+        }
     }
-
-
-
 }
