@@ -17,68 +17,6 @@ open class CurrencyRateUseCase @Inject constructor(private val repository: Curre
      *
      * @return A list of all currencies.
      */
-    /*
-    operator fun invoke(appId: String): Flow<Resource<List<Currency>>> = flow {
-
-
-        //working code
-
-        /* try {
-             emit(Resource.Loading())
-
-             if (repository.isCurrencyTableEmpty() || repository.isDataStale()) {
-                 // Attempt to fetch the data from the API
-                 when (val apiData = repository.getCurrencyRates(appId)) {
-                     is Resource.Success -> {
-                         apiData.data?.let {
-                             // Persist the data in the local database
-                             persistResponse(it)
-                             // Emit the successful API response with currency data
-                             emit(Resource.Success(it.rates!!.currencies))
-                             AppLogger.e(TAG, "API call successful")
-                         }
-                             ?: emit(Resource.Error("Error: Data is null")) // Handle case where API returns null data
-                     }
-
-                     is Resource.Error -> {
-                         AppLogger.e(TAG, "API call failed: ${apiData.message}")
-
-                         // If API call fails, try fetching from the local database
-                         if (!repository.isCurrencyTableEmpty()) {
-                             emit(fetchDataFromDatabase())
-                             AppLogger.e(TAG, "Fetched from DB after API failure")
-                         } else {
-                             // Emit an error if both API and DB fail
-                             emit(
-                                 Resource.Error(
-                                     apiData.message ?: "Unknown Error and no data in DB"
-                                 )
-                             )
-                             AppLogger.e(TAG, "API and DB both failed: ${apiData.message}")
-                         }
-                     }
-
-                     is Resource.Loading -> {
-                         emit(Resource.Loading())
-                     }
-                 }
-             } else {
-                 emit(fetchDataFromDatabase())
-                 AppLogger.e(TAG, "DB call successful (no need for API)")
-             }
-
-         } catch (e: Exception) {
-             // Handle any unexpected exceptions and emit an appropriate error message
-             emit(Resource.Error("Unexpected Error: ${e.localizedMessage}"))
-             AppLogger.e(TAG, "Error: ${e.localizedMessage}")
-         }*/
-
-        //
-
-    }
-
-     */
-
     operator fun invoke(appId: String): Flow<Resource<List<Currency>>> = flow {
         emit(Resource.Loading())
 

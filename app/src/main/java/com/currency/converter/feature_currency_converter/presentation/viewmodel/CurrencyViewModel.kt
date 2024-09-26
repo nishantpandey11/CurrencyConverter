@@ -72,7 +72,7 @@ class CurrencyViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun getCurrencyValue(
+    fun getCurrencyValue(
         selectedCurrency: Int,
         amount: Double,
         currencies: List<Currency>

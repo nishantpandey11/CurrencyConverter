@@ -21,27 +21,6 @@ class DataStoreManager @Inject constructor(
 ) {
 
     /**
-     * Sets the first launch preference.
-     *
-     * @param value The boolean value indicating if it is the first launch.
-     */
-    suspend fun setFirstLaunch(value: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.FIRST_LAUNCH] = value
-        }
-    }
-
-    /**
-     * Checks if it is the first launch of the application.
-     *
-     * @return `true` if it is the first launch, `false` otherwise.
-     */
-    suspend fun isFirstLaunch(): Boolean {
-        val preferences = dataStore.data.first()
-        return preferences[PreferencesKeys.FIRST_LAUNCH] ?: true
-    }
-
-    /**
      * Sets the timestamp of the last update in seconds.
      *
      * @param value The timestamp value in seconds.
@@ -62,14 +41,6 @@ class DataStoreManager @Inject constructor(
         return preferences[PreferencesKeys.TIMESTAMP]?.toLong() ?: Constants.NO_DATA
     }
 
-    /**
-     * Checks if there is no data stored.
-     *
-     * @return `true` if there is no data, `false` otherwise.
-     */
-    suspend fun isDataEmpty(): Boolean {
-        return getTimeSinceLastUpdateInSeconds() == Constants.NO_DATA
-    }
 
     /**
      * Checks if the stored data is stale (older than 30 min ).
@@ -94,12 +65,11 @@ class DataStoreManager @Inject constructor(
     }
 
     object PreferencesKeys {
-        val FIRST_LAUNCH = booleanPreferencesKey("first_launch")
         val TIMESTAMP = longPreferencesKey("timestamp")
     }
 
     object Constants {
-        const val THIRTY_MIN_IN_SECONDS = 1800000L//60000L//
+        const val THIRTY_MIN_IN_SECONDS = 1800000L
         const val NO_DATA = 0L
     }
 }
