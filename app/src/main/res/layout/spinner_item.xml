@@ -4,7 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/_10dp"
+    android:gravity="center"
+    android:paddingStart="@dimen/_30dp"
+    android:paddingTop="@dimen/_10dp"
+    android:paddingBottom="@dimen/_10dp"
+    android:paddingEnd="@dimen/_30dp"
+    android:textSize="@dimen/_16sp"
     android:textStyle="bold"
     tools:text="Value" />
 

@@ -1,7 +1,7 @@
 package com.currency.converter.di
 
 import com.currency.converter.BuildConfig
-import com.currency.converter.data.remote.ApiService
+import com.currency.converter.feature_currency_converter.data.remote.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

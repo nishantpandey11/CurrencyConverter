@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".presentation.MainActivity">
+    tools:context=".feature_currency_converter.presentation.ui.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -25,36 +25,39 @@
         android:id="@+id/etAmount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_10dp"
-        android:layout_marginTop="@dimen/_16dp"
+        android:layout_margin="@dimen/_16dp"
         android:hint="@string/hint_amount"
         android:inputType="numberDecimal"
         android:imeOptions="actionDone"
         android:padding="@dimen/_16dp"
+        android:maxLength="10"
+        android:textSize="@dimen/_16sp"
+        app:layout_constraintStart_toEndOf="@id/spinner_currency"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <!-- Spinner -->
     <Spinner
         android:id="@+id/spinner_currency"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_10dp"
-        android:padding="@dimen/_10dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="@dimen/_16dp"
+        android:padding="@dimen/_16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etAmount" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <Button
         android:id="@+id/btnSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_10dp"
+        android:layout_margin="@dimen/_16dp"
+        android:paddingStart="@dimen/_30dp"
+        android:paddingEnd="@dimen/_30dp"
+        android:textSize="@dimen/_16sp"
         android:text="@string/txt_calculate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_currency" />
+        app:layout_constraintTop_toBottomOf="@+id/etAmount" />
 
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
@@ -62,7 +65,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/_10dp"
-        android:layout_marginTop="@dimen/_16dp"
         android:padding="@dimen/_16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

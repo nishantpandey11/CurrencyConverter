@@ -1,4 +1,4 @@
-package com.currency.converter.presentation
+package com.currency.converter.utils
 
 import android.content.BroadcastReceiver
 import android.content.Context

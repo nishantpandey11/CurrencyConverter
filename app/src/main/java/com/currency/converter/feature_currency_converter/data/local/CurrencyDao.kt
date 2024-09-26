@@ -1,4 +1,4 @@
-package com.currency.converter.data.local
+package com.currency.converter.feature_currency_converter.data.local
 
 import androidx.room.Dao
 import androidx.room.Query
@@ -34,7 +34,7 @@ interface CurrencyDao {
      * @param exchangeRate The new exchange rate of the currency.
      */
     @Query("UPDATE Currency SET exchangeRate = :exchangeRate WHERE currencyCode = :currencyCode")
-    suspend fun updateExchangeRate(currencyCode: String, exchangeRate: Double)
+    suspend fun updateExchangeRate(currencyCode: String, exchangeRate: String)
 
     /**
      * Updates the exchange rates of a list of currencies in a transaction.

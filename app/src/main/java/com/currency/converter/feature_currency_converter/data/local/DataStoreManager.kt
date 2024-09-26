@@ -1,4 +1,4 @@
-package com.currency.converter.data.local
+package com.currency.converter.feature_currency_converter.data.local
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

@@ -3,4 +3,6 @@
     <string name="hint_amount">Enter amount</string>
     <string name="txt_calculate">Calculate</string>
     <string name="txt_something_went_wrong">Something went wrong!</string>
+    <string name="txt_valid_amount">Please enter a valid amount </string>
+    <string name="txt_empty_list">Currency List is empty</string>
 </resources>

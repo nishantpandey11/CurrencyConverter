@@ -1,4 +1,4 @@
-package com.currency.converter.domain
+package com.currency.converter.feature_currency_converter.domain
 
 import com.currency.converter.utils.Resource
 import kotlinx.coroutines.flow.Flow

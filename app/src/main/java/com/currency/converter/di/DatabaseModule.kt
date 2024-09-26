@@ -2,8 +2,8 @@ package com.currency.converter.di
 
 import android.content.Context
 import androidx.room.Room
-import com.currency.converter.data.local.CurrencyDao
-import com.currency.converter.data.local.CurrencyDatabase
+import com.currency.converter.feature_currency_converter.data.local.CurrencyDao
+import com.currency.converter.feature_currency_converter.data.local.CurrencyDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

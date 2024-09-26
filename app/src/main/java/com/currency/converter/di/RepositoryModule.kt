@@ -1,11 +1,11 @@
 package com.currency.converter.di
 
 
-import com.currency.converter.data.local.CurrencyDao
-import com.currency.converter.data.local.DataStoreManager
-import com.currency.converter.data.remote.ApiService
-import com.currency.converter.data.CurrencyRepositoryImpl
-import com.currency.converter.domain.CurrencyRepository
+import com.currency.converter.feature_currency_converter.data.local.CurrencyDao
+import com.currency.converter.feature_currency_converter.data.local.DataStoreManager
+import com.currency.converter.feature_currency_converter.data.remote.ApiService
+import com.currency.converter.feature_currency_converter.data.CurrencyRepositoryImpl
+import com.currency.converter.feature_currency_converter.domain.CurrencyRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

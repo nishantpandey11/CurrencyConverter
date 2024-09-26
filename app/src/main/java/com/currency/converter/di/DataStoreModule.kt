@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.currency.converter.data.local.DataStoreManager
+import com.currency.converter.feature_currency_converter.data.local.DataStoreManager
 import com.currency.converter.utils.DefaultTimeProvider
 import com.currency.converter.utils.TimeProvider
 import dagger.Module

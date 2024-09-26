@@ -1,4 +1,4 @@
-package com.currency.converter.data.local
+package com.currency.converter.feature_currency_converter.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class Currency(
     @PrimaryKey
     val currencyCode: String,
-    val exchangeRate: Double
+    val exchangeRate: String
 )

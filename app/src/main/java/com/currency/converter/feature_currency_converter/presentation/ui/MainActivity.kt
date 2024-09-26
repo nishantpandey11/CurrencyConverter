@@ -1,4 +1,4 @@
-package com.currency.converter.presentation
+package com.currency.converter.feature_currency_converter.presentation.ui
 
 import android.content.IntentFilter
 import android.net.ConnectivityManager
@@ -6,10 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -18,11 +14,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.currency.converter.BuildConfig
 import com.currency.converter.R
-import com.currency.converter.data.local.Currency
+import com.currency.converter.databinding.ActivityMainBinding
+import com.currency.converter.feature_currency_converter.data.local.Currency
+import com.currency.converter.feature_currency_converter.presentation.viewmodel.CurrencyViewModel
 import com.currency.converter.utils.AppLogger
+import com.currency.converter.utils.NetworkChangeListener
+import com.currency.converter.utils.NetworkChangeReceiver
 import com.currency.converter.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -30,19 +29,14 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), NetworkChangeListener {
+    private lateinit var binding: ActivityMainBinding
     private val currencyViewModel: CurrencyViewModel by viewModels()
-    private lateinit var currencySpinner: Spinner
-    private lateinit var etAmount: EditText
-    private lateinit var btnSubmit: Button
-    private lateinit var rvCurrencyValue: RecyclerView
-    private lateinit var progressBar: ProgressBar
     private lateinit var adapter: ExchangeRateAdapter
+    private lateinit var networkReceiver: NetworkChangeReceiver
     private var exchangeRateList: List<Currency> = emptyList()
     private var selectedCurrencyPosition: Int = 0
-    private lateinit var networkReceiver: NetworkChangeReceiver
     private var hasFetchFinished: Boolean = false
     private val TAG = "MainActivity"
-
 
     override fun onResume() {
         super.onResume()
@@ -54,70 +48,60 @@ class MainActivity : AppCompatActivity(), NetworkChangeListener {
         super.onPause()
         unregisterReceiver(networkReceiver)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        initViews()
-        networkReceiver = NetworkChangeReceiver(this)
+
+        initRecyclerView()
+        initListeners()
+        getExchangeData()
         initObservers()
-
-
     }
 
-    private fun initViews() {
-        currencySpinner = findViewById(R.id.spinner_currency)
-        etAmount = findViewById(R.id.etAmount)
-        rvCurrencyValue = findViewById(R.id.rv_currency_value)
-        btnSubmit = findViewById(R.id.btnSubmit)
-        progressBar = findViewById(R.id.pb)
-
-        val layoutManager = LinearLayoutManager(this)
-        layoutManager.orientation = LinearLayoutManager.VERTICAL
-        rvCurrencyValue.layoutManager = layoutManager
-
-        btnSubmit.setOnClickListener {
-            val text = etAmount.text.toString()
-            if (text.isEmpty()) {
-                showError("Please enter a valid amount")
-                return@setOnClickListener
-            }
-            if (exchangeRateList.isEmpty()) {
-                showError("Currency List empty")
-                exchangeRateList = emptyList()
-                return@setOnClickListener
-            }
-            val amountValueInOtherCurrenciesList =
-                currencyViewModel.getCurrencyValue(
-                    selectedCurrencyPosition,
-                    text.toDouble(),
-                    exchangeRateList
-                )
-            setAdapter(amountValueInOtherCurrenciesList)
+    private fun initRecyclerView() {
+        adapter = ExchangeRateAdapter()
+        binding.rvCurrencyValue.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = this@MainActivity.adapter
         }
     }
 
-    private fun setAdapter(exchangeRates: List<Currency>) {
-        adapter = ExchangeRateAdapter(data = exchangeRates)
-        rvCurrencyValue.adapter = adapter
+    private fun initListeners() {
+        networkReceiver = NetworkChangeReceiver(this)
+        binding.btnSubmit.setOnClickListener {
+            val amount = binding.etAmount.text.toString()
+            currencyViewModel.onSubmitClick(amount, exchangeRateList, selectedCurrencyPosition)
+        }
     }
 
-    private fun initObservers() {
+    private fun updateExchangeList(exchangeList: List<Currency>) {
+        adapter.submitList(exchangeList)
+    }
 
+    private fun getExchangeData() {
         lifecycle.coroutineScope.launch {
             currencyViewModel.getExchangeRate(BuildConfig.APP_ID)
         }
+    }
+
+    private fun initObservers() {
 
         lifecycle.coroutineScope.launch(Dispatchers.Main) {
             currencyViewModel.exchangeRateState.collect { currencyListState ->
                 when (currencyListState) {
                     is Resource.Loading -> showLoading()
                     is Resource.Error -> {
+                        updateExchangeList(emptyList())
                         showError(currencyListState.message!!)
                         hasFetchFinished = true
                     }
@@ -126,7 +110,7 @@ class MainActivity : AppCompatActivity(), NetworkChangeListener {
                         hideLoading()
                         currencyListState.data?.let {
                             exchangeRateList = it
-                            setAdapter(it)
+                            updateExchangeList(exchangeRateList)
                             currencyViewModel.getAllCurrencies()
                         }
                     }
@@ -154,14 +138,26 @@ class MainActivity : AppCompatActivity(), NetworkChangeListener {
 
             }
         }
+
+        currencyViewModel.currencyValueState.observe(this) {
+            updateExchangeList(it)
+        }
+
+
+        currencyViewModel.validationState.observe(this) {
+            val error = getString(it)
+            if (error.isNotEmpty())
+                showError(error)
+        }
+
     }
 
     private fun showLoading() {
-        progressBar.visibility = View.VISIBLE
+        binding.pb.visibility = View.VISIBLE
     }
 
     private fun hideLoading() {
-        progressBar.visibility = View.GONE
+        binding.pb.visibility = View.GONE
     }
 
 
@@ -173,9 +169,10 @@ class MainActivity : AppCompatActivity(), NetworkChangeListener {
 
     private fun initSpinner(currencyList: List<String>) {
 
-        currencySpinner.adapter = ArrayAdapter(this, R.layout.spinner_item, currencyList)
+        binding.spinnerCurrency.adapter = ArrayAdapter(this, R.layout.spinner_item, currencyList)
 
-        currencySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.spinnerCurrency.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
@@ -194,13 +191,11 @@ class MainActivity : AppCompatActivity(), NetworkChangeListener {
     }
 
     override fun onNetworkChanged() {
-        AppLogger.e(TAG, "network changed")
+        AppLogger.e(TAG, "Device Online")
         if (hasFetchFinished && exchangeRateList.isEmpty()) {
-            initObservers()
+            getExchangeData()
+            AppLogger.e(TAG, "Device Online called")
         }
     }
 }
 
-interface NetworkChangeListener {
-    fun onNetworkChanged()
-}
