@@ -37,18 +37,21 @@ open class CurrencyRateUseCase @Inject constructor(private val repository: Curre
                         handleFetchError("API response body is null")
                     }
                 } else {
-                    handleFetchError("API call failed with error: ${res.message()}", isTableEmpty)
+                    handleFetchError(
+                        "API call failed with error: Response malfunction",
+                        isTableEmpty
+                    )
                 }
             } else {
                 emit(fetchDataFromDatabase()) // Fetch from DB when data is not stale
                 AppLogger.e(TAG, "DB call successful (no need for API)")
             }
         } catch (e: Exception) {
-            handleFetchError("Exception: ${e.localizedMessage}", repository.isCurrencyTableEmpty())
+            handleFetchError("Exception: ${e.printStackTrace()}", repository.isCurrencyTableEmpty())
         }
     }
 
-    private suspend fun FlowCollector<Resource<List<Currency>>>.handleFetchError(
+    suspend fun FlowCollector<Resource<List<Currency>>>.handleFetchError(
         errorMessage: String, isTableEmpty: Boolean = false
     ) {
         AppLogger.e(TAG, errorMessage)
@@ -65,7 +68,7 @@ open class CurrencyRateUseCase @Inject constructor(private val repository: Curre
 
 
     // Helper function to fetch data from the database
-    private suspend fun fetchDataFromDatabase(apiErrorMessage: String? = null): Resource<List<Currency>> {
+    suspend fun fetchDataFromDatabase(apiErrorMessage: String? = null): Resource<List<Currency>> {
         return try {
             val dbData = repository.getAllCurrencies()
             if (dbData.isNotEmpty()) {
@@ -74,7 +77,7 @@ open class CurrencyRateUseCase @Inject constructor(private val repository: Curre
                 Resource.Error(apiErrorMessage ?: "No data in DB")
             }
         } catch (e: Exception) {
-            Resource.Error("Database Error: ${e.localizedMessage}")
+            Resource.Error("Database Error: ${e.printStackTrace()}")
         }
     }
 
@@ -85,7 +88,7 @@ open class CurrencyRateUseCase @Inject constructor(private val repository: Curre
      * @param payload The data payload containing exchange rates and timestamp.
      */
 
-    private suspend fun persistResponse(payload: CurrencyRateData) {
+    suspend fun persistResponse(payload: CurrencyRateData) {
         payload.rates?.let { exchangeRates ->
             repository.upsertCurrencies(currencies = exchangeRates.currencies)
         }
