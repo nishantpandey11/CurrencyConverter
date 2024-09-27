@@ -22,6 +22,11 @@ object NetworkModule {
     @Provides
     fun provideBaseUrl() = BuildConfig.BASE_URL
 
+    /**
+     * Provides a singleton instance of [OkHttpClient].
+     *
+     * @return A singleton [OkHttpClient] instance.
+     */
     @Singleton
     @Provides
     fun provideOkHttpClient(): OkHttpClient {
@@ -36,6 +41,10 @@ object NetworkModule {
         return okHttpClientBuilder.build()
     }
 
+
+    /**
+     * Provides a singleton instance of [Retrofit].
+     */
     @Provides
     @Singleton
     fun provideRetrofit(
@@ -49,6 +58,11 @@ object NetworkModule {
             .build()
 
 
+    /**
+     * Provides a singleton instance of [ApiService].
+     *
+     * @return A singleton [ApiService] instance.
+     */
     @Provides
     @Singleton
     fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)

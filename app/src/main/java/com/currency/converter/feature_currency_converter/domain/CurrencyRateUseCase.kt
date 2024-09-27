@@ -82,7 +82,7 @@ open class CurrencyRateUseCase @Inject constructor(private val repository: Curre
     }
 
 
-    /*
+    /**
      * Persists the response payload containing exchange rates and timestamp.
      *
      * @param payload The data payload containing exchange rates and timestamp.

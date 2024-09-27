@@ -10,7 +10,6 @@ class NetworkChangeReceiver(private val listener: NetworkChangeListener) : Broad
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (isInternetAvailable(context!!)) {
-            // Notify the listener (activity)
             listener.onNetworkChanged()
         }
     }

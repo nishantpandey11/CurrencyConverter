@@ -29,10 +29,8 @@ class CurrencyRepositoryImplTest {
 
     @Mock
     private lateinit var apiService: ApiService
-
     @Mock
     private lateinit var currencyDao: CurrencyDao
-
     @Mock
     private lateinit var dataStoreManager: DataStoreManager
 
